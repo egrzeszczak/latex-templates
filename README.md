@@ -1,3 +1,3 @@
 # latex-templates
 
-LaTeX documents templates
+My LaTeX document templates
