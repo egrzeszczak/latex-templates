@@ -1,3 +1,3 @@
 # latex-templates
 
-My LaTeX document templates
+My LaTeX templates for various purposes (cybersecurity reports, lab writeups, standard operating procedures, etc.)
