@@ -1,0 +1,285 @@
+%%  
+%%  A uniform document style file made for LaTeX documents
+%%  Import the style via 'import' command
+%%  
+%%  Author: @egrzeszczak
+%%  
+
+%%  ========================================================================
+%%  Use article document class
+%%  ========================================================================
+
+% Add this line to the top of your TeX document
+% \documentclass[12pt]{article} 
+
+%%  ========================================================================
+%%  Set paper geometry
+%%  ========================================================================
+
+\usepackage[a4paper, inner=1.5cm, outer=1.5cm, top=2cm, bottom=2cm]{geometry}
+
+%%  ========================================================================
+%%  Set font
+%%  ========================================================================
+
+\usepackage{fontspec}
+\setmainfont{Arimo}
+
+%%  ========================================================================
+%%  Set automatic indent to 0px
+%%  ========================================================================
+
+\setlength{\parindent}{0pt} 
+
+%%  ========================================================================
+%%  Use pictures
+%%  ========================================================================
+
+\usepackage{graphicx}
+
+%%  ========================================================================
+%%  Page layout
+%%  ========================================================================
+
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+%%  ========================================================================
+%%  TLP Settings (https://www.first.org/tlp/docs/tlp-a4.pdf)
+%%  ========================================================================
+
+\usepackage{xcolor}
+\definecolor{tlpclear}{RGB}{255, 255, 255}
+\definecolor{tlpgreen}{RGB}{51, 255, 0}
+\definecolor{tlpamber}{RGB}{255, 192, 0}
+\definecolor{tlpred}{RGB}{255, 43, 43}
+
+\fancyfoot[C]{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+
+% \newcommand{\TLP}{TLP:CLEAR}                                                                      % uncomment for TLP:CLEAR
+% \fancyhead[R]{\footnotesize \colorbox{black}{\textcolor{tlpclear}{\textbf{\TLP}}}}                % uncomment for TLP:CLEAR
+% \fancyfoot[R]{\footnotesize \colorbox{black}{\textcolor{tlpclear}{\textbf{\TLP}}}}                % uncomment for TLP:CLEAR
+
+\newcommand{\TLP}{TLP:GREEN}                                                                    % uncomment for TLP:GREEN
+\fancyhead[R]{\footnotesize \colorbox{black}{\textcolor{tlpgreen}{\textbf{\TLP}}}}              % uncomment for TLP:GREEN
+\fancyfoot[R]{\footnotesize \colorbox{black}{\textcolor{tlpgreen}{\textbf{\TLP}}}}              % uncomment for TLP:GREEN
+
+% \newcommand{\TLP}{TLP:AMBER}                                                                    % uncomment for TLP:AMBER
+% \fancyhead[R]{\footnotesize \colorbox{black}{\textcolor{tlpamber}{\textbf{\TLP}}}}              % uncomment for TLP:AMBER
+% \fancyfoot[R]{\footnotesize \colorbox{black}{\textcolor{tlpamber}{\textbf{\TLP}}}}              % uncomment for TLP:AMBER
+
+% \newcommand{\TLP}{TLP:AMBER+STRICT}                                                             % uncomment for TLP:AMBER+STRICT
+% \fancyhead[R]{\footnotesize \colorbox{black}{\textcolor{tlpamber}{\textbf{\TLP}}}}              % uncomment for TLP:AMBER+STRICT
+% \fancyfoot[R]{\footnotesize \colorbox{black}{\textcolor{tlpamber}{\textbf{\TLP}}}}              % uncomment for TLP:AMBER+STRICT
+
+% \newcommand{\TLP}{TLP:RED}                                                                      % uncomment for TLP:RED
+% \fancyhead[R]{\footnotesize \colorbox{black}{\textcolor{tlpred}{\textbf{\TLP}}}}                % uncomment for TLP:RED
+% \fancyfoot[R]{\footnotesize \colorbox{black}{\textcolor{tlpred}{\textbf{\TLP}}}}                % uncomment for TLP:RED
+
+%%  ========================================================================
+%%  Custom footnotes
+%%  ========================================================================
+
+\usepackage[symbol]{footmisc}
+
+%%  ========================================================================
+%%  Single codeword highlighter
+%%  ========================================================================
+
+\newcommand{\backtick}[2][gray!20]{%
+  \colorbox{#1}{%
+    {\codefont\fontsize{10pt}{9.6pt}\selectfont #2}%
+  }%
+}
+
+%%  ========================================================================
+%%  Timeline
+%%  ========================================================================
+
+\usepackage{environ}
+\usepackage{tikz}
+\usetikzlibrary{calc,matrix}
+
+%% Code by Claudio:
+%% https://tex.stackexchange.com/a/197447/221452
+%% Uses code by Andrew:
+%% http://tex.stackexchange.com/a/28452/13304
+\makeatletter
+    \let\matamp=&
+    \catcode`\&=13
+    \def&{%
+        \iftikz@is@matrix%
+            \pgfmatrixnextcell%
+        \else%
+            \matamp%
+        \fi%
+    }
+\makeatother
+
+\newcounter{lines}
+\def\endlr{\stepcounter{lines}\\}
+
+\newcounter{vtml}
+\setcounter{vtml}{0}
+
+\newif\ifvtimelinetitle
+\newif\ifvtimebottomline
+
+\tikzset{
+    description/.style={column 2/.append style={#1}},
+    timeline color/.store in=\vtmlcolor,
+    timeline color=red!80!black,
+    timeline color st/.style={fill=\vtmlcolor,draw=\vtmlcolor},
+    use timeline header/.is if=vtimelinetitle,
+    use timeline header=false,
+    add bottom line/.is if=vtimebottomline,
+    add bottom line=false,
+    timeline title/.store in=\vtimelinetitle,
+    timeline title={},
+    line offset/.store in=\lineoffset,
+    line offset=4pt,
+}
+
+\NewEnviron{vtimeline}[1][]{%
+    \setcounter{lines}{1}%
+    \stepcounter{vtml}%
+    \begin{tikzpicture}[column 1/.style={anchor=east},
+        column 2/.style={anchor=west},
+        text depth=0pt,text height=1ex,
+        row sep=1ex,
+        column sep=1em,
+        #1
+    ]
+        \matrix(vtimeline\thevtml)[matrix of nodes]{\BODY};
+        \pgfmathtruncatemacro\endmtx{\thelines-1}
+
+        \path[timeline color st]
+            ($(vtimeline\thevtml-1-1.north east)!0.5!(vtimeline\thevtml-1-2.north west)$)--
+            ($(vtimeline\thevtml-\endmtx-1.south east)!0.5!(vtimeline\thevtml-\endmtx-2.south west)$);
+
+        \foreach \x in {1,...,\endmtx}{
+            \node[circle,timeline color st, inner sep=0.15pt, draw=white, thick]
+            (vtimeline\thevtml-c-\x) at
+            ($(vtimeline\thevtml-\x-1.east)!0.5!(vtimeline\thevtml-\x-2.west)$){};
+                \draw[timeline color st](vtimeline\thevtml-c-\x.west)--++(-3pt,0);
+        }
+
+        \ifvtimelinetitle%
+            \draw[timeline color st]([yshift=\lineoffset]vtimeline\thevtml.north west)--
+                ([yshift=\lineoffset]vtimeline\thevtml.north east);
+
+            \node[anchor=west,yshift=16pt,font=\large]
+                at (vtimeline\thevtml-1-1.north west)
+                {\textsc{Timeline \thevtml}: \textit{\vtimelinetitle}};
+        \else%
+            \relax%
+        \fi%
+
+        \ifvtimebottomline%
+            \draw[timeline color st]([yshift=-\lineoffset]vtimeline\thevtml.south west)--
+            ([yshift=-\lineoffset]vtimeline\thevtml.south east);
+        \else%
+            \relax%
+        \fi%
+    \end{tikzpicture}
+}
+
+% Sample to use in the document
+% 
+% \begin{vtimeline}[description={text width=7cm},
+%     row sep=4ex,
+%     use timeline header,
+%     timeline title={The title}]
+%     1947 & AT and T Bell Labs develop the idea of cellular phones\endlr
+%     1968 & Xerox Palo Alto Research Centre envisage the `Dynabook'\endlr
+%     1971 & Busicom 'Handy-LE' Calculator\endlr
+%     1973 & First mobile handset invented by Martin Cooper\endlr
+%     1978 & Parker Bros. Merlin Computer Toy\endlr
+%     1981 & Osborne 1 Portable Computer\endlr
+%     1982 & Grid Compass 1100 Clamshell Laptop\endlr
+%     1983 & TRS-80 Model 100 Portable PC\endlr
+%     1984 & Psion Organiser Handheld Computer\endlr
+%     1991 & Psion Series 3 Minicomputer\endlr
+% \end{vtimeline}
+% or
+% \begin{vtimeline}[timeline color=black!80!gray, line offset=2pt]
+%     1947 & AT and T Bell Labs develop the idea of cellular phones\endlr
+%     1968 & Xerox Palo Alto Research Centre envisage the `Dynabook'\endlr
+%     1971 & Busicom 'Handy-LE' Calculator\endlr
+%     1973 & First mobile handset invented by Martin Cooper\endlr
+%     1978 & Parker Bros. Merlin Computer Toy\endlr
+%     1981 & Osborne 1 Portable Computer\endlr
+%     1982 & Grid Compass 1100 Clamshell Laptop\endlr
+%     1983 & TRS-80 Model 100 Portable PC\endlr
+%     1984 & Psion Organiser Handheld Computer\endlr
+%     1991 & Psion Series 3 Minicomputer\endlr
+% \end{vtimeline}
+
+%%  ========================================================================
+%%  Code highlight
+%%  ========================================================================
+
+\usepackage{listings}
+
+\newfontfamily{\codefont}{Input Mono}    % font for code snippets
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{red}{rgb}{0.9,0.1,0.1}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+  frame=single,
+  framesep=0.25cm,
+  framexleftmargin=0cm,
+  framexrightmargin=0cm,
+  rulecolor=\color{lightgray},
+  backgroundcolor=\color{lightgray!20},
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\codefont\fontsize{9}{10}\selectfont},
+  numbers=none,
+  numberstyle=\tiny\color{red},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  tabsize=3,
+  framextopmargin=0pt,
+  framexbottommargin=0pt,
+}
+
+%%  ========================================================================
+%%  Questions
+%%  ========================================================================
+
+\usepackage{enumitem}
+
+\newlist{questions}{enumerate}{3}
+\setlist[questions]{itemindent=1cm, align=parleft,itemsep=0.25cm,parsep=\lineskip}
+\setlist[questions,1]{label=Q\,\arabic*,leftmargin=1.5\parindent,labelindent=0pt,ref=\arabic*}
+\setlist[questions,2]{label=Q\,\arabic{questionsi}.\arabic*,leftmargin=.5\parindent,labelindent=-1.5\parindent,ref=\arabic{questionsi}.\arabic*,topsep=\lineskip,partopsep=\lineskip}
+\setlist[questions,3]{label=Q\,\arabic{questionsi}.\arabic{questionsii}.\arabic*,leftmargin=.5\parindent,labelindent=-2\parindent,ref=\arabic{questionsi}.\arabic{questionsii}.\arabic*,topsep=\lineskip,partopsep=\lineskip}
+\newcommand*\qn{\stepcounter{cntquestions}\item\label{qn:\thecntquestions}}
+\newcommand*\ans{\item[A\,\ref{qn:\thecntquestions}]}
+\newcounter{cntquestions}
+
+%%  ========================================================================
+%%  Additional settings
+%%  ========================================================================
+
+% \usepackage{showframe}                  % shows the document framing
+\usepackage{blindtext}                  % generates placeholder text
+\usepackage{xcolor}                     % for additional coloring
+\usepackage{array}                      % for table styling
+\usepackage[hidelinks]{hyperref}        % links
+% \renewcommand*{\contentsname}{Spis treści} % rename the toc heading
